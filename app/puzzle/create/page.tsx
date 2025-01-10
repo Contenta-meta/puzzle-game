@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Canvas from "@/components/Canvas";
 import Pieces from "@/components/Pieces";
 import { PuzzlePiece } from "@/types/types";
-import { Upload, Scissors, Save } from "lucide-react";
+import { Upload, Scissors, Save, Loader } from "lucide-react";
 import {
   CldUploadButton,
   CloudinaryUploadWidgetResults,
@@ -18,6 +18,7 @@ export default function PuzzleCreate() {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [isSaving, setIsSaving] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const router = useRouter();
 
@@ -51,6 +52,7 @@ export default function PuzzleCreate() {
   // };
 
   const handleSavePuzzle = async () => {
+    setIsSaving(true);
     const puzzleData = {
       image: image?.src,
       pieces,
@@ -62,6 +64,8 @@ export default function PuzzleCreate() {
       router.push(`/puzzle/play/${data.id}`);
     } catch (error) {
       console.error("Error saving puzzle:", error);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -89,10 +93,19 @@ export default function PuzzleCreate() {
           <Button
             onClick={handleSavePuzzle}
             className="bg-green-400 hover:bg-green-500 text-white font-bold py-6 px-8 rounded-full text-lg inline-flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-transform hover:scale-105"
-            disabled={!image || pieces.length === 0}
+            disabled={!image || pieces.length === 0 || isSaving}
           >
-            <Save className="w-6 h-6" />
-            Save and Start Playing!
+            {isSaving ? (
+              <>
+                <Loader className="w-6 h-6 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="w-6 h-6" />
+                Save and Start Playing!
+              </>
+            )}
           </Button>
           {(!image || pieces.length === 0) && (
             <p className="text-red-500 mt-2">
