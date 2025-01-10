@@ -27,5 +27,5 @@ export const usePuzzles = () => {
     fetchPuzzles();
   }, []);
 
-  return { puzzles, error, loading, refetch: fetchPuzzles };
+  return { puzzles, setPuzzles,error, loading, refetch: fetchPuzzles };
 };

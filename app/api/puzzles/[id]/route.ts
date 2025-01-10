@@ -6,6 +6,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+export const runtime = "edge";
+
 export async function GET(
   request: Request,
   {

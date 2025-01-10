@@ -2,21 +2,21 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Puzzle } from "@/types/types";
 import { PuzzleIcon, Plus, Trash2 } from "lucide-react";
 import axios from "axios";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { usePuzzles } from "@/hooks/usePuzzles";
+import ErrorPage from "./ErrorPage";
 
-export default function PuzzleList({ data: initialData }: { data: Puzzle[] }) {
-  const [data, setData] = useState<Puzzle[]>(initialData);
+export default function PuzzleList() {
+  const { puzzles, setPuzzles, error } = usePuzzles();
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     if (confirm("Are you sure you want to delete this puzzle?")) {
       try {
         await axios.delete(`/api/puzzles/${id}`);
-        setData(data.filter(puzzle => puzzle.id !== id));
+        setPuzzles(puzzles.filter((puzzle) => puzzle.id !== id));
       } catch (error) {
         console.error("Error deleting puzzle:", error);
         alert("Failed to delete puzzle");
@@ -24,13 +24,17 @@ export default function PuzzleList({ data: initialData }: { data: Puzzle[] }) {
     }
   };
 
+  if (error) {
+    return <ErrorPage />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-orange-100 p-8">
       <h1 className="text-5xl font-bold text-center text-purple-600 mb-8 animate-bounce">
         Puzzle Paradise
       </h1>
 
-      {data.length === 0 ? (
+      {puzzles.length === 0 ? (
         <div className="text-center bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
           <PuzzleIcon className="w-24 h-24 text-purple-600 mx-auto mb-4" />
           <p className="text-2xl text-gray-700 mb-6">
@@ -49,7 +53,7 @@ export default function PuzzleList({ data: initialData }: { data: Puzzle[] }) {
             Choose a puzzle and let the fun begin!
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {data.map((puzzle) => (
+            {puzzles.map((puzzle) => (
               <Link
                 key={puzzle.id}
                 href={`/puzzle/play/${puzzle.id}`}

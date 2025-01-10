@@ -3,11 +3,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import Pieces from "@/components/Pieces";
 import { PuzzlePiece, Puzzle } from "@/types/types";
-import { Loader, Trophy } from "lucide-react";
+import { Trophy } from "lucide-react";
 import confetti from "canvas-confetti";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import ImageDescription from "./ImageDescription";
+import Loader from "./Loader";
 
 export default function PuzzlePlay({ id }: { id: string }) {
   const [loading, setLoading] = useState(true);
