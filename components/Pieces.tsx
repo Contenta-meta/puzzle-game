@@ -7,14 +7,14 @@ import { PuzzlePiece } from "@/types/types";
 interface PiecesProps {
   pieces: PuzzlePiece[];
   onPieceChange: (piece: { id: string; x: number; y: number }) => void;
-  onPieceRemove: (id: string) => void;
+  // onPieceRemove: (id: string) => void;
   canvasRef: React.RefObject<HTMLCanvasElement>;
 }
 
 const Pieces: React.FC<PiecesProps> = ({
   pieces,
   onPieceChange,
-  onPieceRemove,
+  // onPieceRemove,
   canvasRef,
 }) => {
   return (
@@ -24,7 +24,7 @@ const Pieces: React.FC<PiecesProps> = ({
           key={id}
           id={id}
           onPieceChange={onPieceChange}
-          onPieceRemove={onPieceRemove}
+          // onPieceRemove={onPieceRemove}
           canvasRef={canvasRef}
           originalPath={originalPath}
           {...props}

@@ -7,12 +7,14 @@ import { Loader, Trophy } from "lucide-react";
 import confetti from "canvas-confetti";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
+import ImageDescription from "./ImageDescription";
 
 export default function PuzzlePlay({ id }: { id: string }) {
   const [loading, setLoading] = useState(true);
   const [puzzle, setPuzzle] = useState<Puzzle | null>(null);
   const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
   const [isComplete, setIsComplete] = useState(false);
+  const [image, setImage] = useState<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -24,8 +26,7 @@ export default function PuzzlePlay({ id }: { id: string }) {
         setPieces(data.pieces);
       } catch (error) {
         console.error("Error fetching puzzle:", error);
-      }
-      finally{
+      } finally {
         setLoading(false);
       }
     };
@@ -43,7 +44,7 @@ export default function PuzzlePlay({ id }: { id: string }) {
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.onload = () => {
-          // First draw the full image
+          setImage(img);
           ctx.drawImage(
             img,
             0,
@@ -166,11 +167,12 @@ export default function PuzzlePlay({ id }: { id: string }) {
             <Pieces
               pieces={pieces}
               onPieceChange={onPieceChange}
-              onPieceRemove={() => {}}
+              // onPieceRemove={() => {}}
               canvasRef={canvasRef as React.RefObject<HTMLCanvasElement>}
             />
           </div>
         </div>
+        {image && <ImageDescription image={image} />}
         {isComplete && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-8 rounded-lg text-center">
@@ -181,12 +183,18 @@ export default function PuzzlePlay({ id }: { id: string }) {
               <p className="text-xl text-gray-700 mb-4">
                 You`re a puzzle master! Great job completing the puzzle!
               </p>
-              <Button
-                onClick={resetPuzzle}
-                className="bg-green-400 hover:bg-green-500 text-white font-bold py-6 px-4 rounded-full text-lg transition-transform hover:scale-105"
-              >
-                Play Again
-              </Button>
+              <div>
+                <Button
+                  onClick={resetPuzzle}
+                  className="bg-green-400 hover:bg-green-500 text-white font-bold py-6 px-4 rounded-full text-lg transition-transform hover:scale-105"
+                >
+                  Play Again
+                </Button>
+
+                <Button onClick={() => setIsComplete(false)} variant={"link"}>
+                  Close
+                </Button>
+              </div>
             </div>
           </div>
         )}

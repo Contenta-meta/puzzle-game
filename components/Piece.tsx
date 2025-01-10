@@ -11,7 +11,7 @@ interface PieceProps {
   width: number;
   height: number;
   onPieceChange: (piece: { id: string; x: number; y: number }) => void;
-  onPieceRemove?: (id: string) => void;
+  // onPieceRemove: (id: string) => void;
   canvasRef: React.RefObject<HTMLCanvasElement>;
   originalPath?: { x: number; y: number }[];
 }
