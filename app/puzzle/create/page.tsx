@@ -27,7 +27,7 @@ export default function PuzzleCreate() {
       img.src = result.info.secure_url;
       img.onload = () => {
         setImage(img);
-        setDimensions({ width: img.width, height: img.height });
+        setDimensions({ width: 600, height: 800 }); // Set fixed canvas size
       };
     }
   };

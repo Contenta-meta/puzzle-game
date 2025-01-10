@@ -3,9 +3,27 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Puzzle } from "@/types/types";
-import {  PuzzleIcon, Plus } from "lucide-react";
+import { PuzzleIcon, Plus, Trash2 } from "lucide-react";
+import axios from "axios";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
-export default function PuzzleList({ data }: { data: Puzzle[] }) {
+export default function PuzzleList({ data: initialData }: { data: Puzzle[] }) {
+  const [data, setData] = useState<Puzzle[]>(initialData);
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    if (confirm("Are you sure you want to delete this puzzle?")) {
+      try {
+        await axios.delete(`/api/puzzles/${id}`);
+        setData(data.filter(puzzle => puzzle.id !== id));
+      } catch (error) {
+        console.error("Error deleting puzzle:", error);
+        alert("Failed to delete puzzle");
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-yellow-200 to-orange-100 p-8">
       <h1 className="text-5xl font-bold text-center text-purple-600 mb-8 animate-bounce">
@@ -35,7 +53,7 @@ export default function PuzzleList({ data }: { data: Puzzle[] }) {
               <Link
                 key={puzzle.id}
                 href={`/puzzle/play/${puzzle.id}`}
-                className="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all hover:scale-105 hover:shadow-xl"
+                className="group bg-white rounded-lg shadow-lg overflow-hidden transform transition-all hover:scale-105 hover:shadow-xl relative"
               >
                 <div className="relative w-400 aspect-[4/3]">
                   <Image
@@ -45,6 +63,13 @@ export default function PuzzleList({ data }: { data: Puzzle[] }) {
                     className="object-cover"
                     loading="lazy"
                   />
+                  <Button
+                    variant="destructive"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => handleDelete(puzzle.id, e)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
                 </div>
                 <div className="p-4">
                   <h2 className="text-2xl font-bold text-purple-600 mb-2">

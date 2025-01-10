@@ -9,6 +9,7 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 
 export default function PuzzlePlay({ id }: { id: string }) {
+  const [loading, setLoading] = useState(true);
   const [puzzle, setPuzzle] = useState<Puzzle | null>(null);
   const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
   const [isComplete, setIsComplete] = useState(false);
@@ -17,11 +18,15 @@ export default function PuzzlePlay({ id }: { id: string }) {
   useEffect(() => {
     const fetchPuzzle = async () => {
       try {
+        setLoading(true);
         const { data } = await axios.get(`/api/puzzles/${id}`);
         setPuzzle(data);
         setPieces(data.pieces);
       } catch (error) {
         console.error("Error fetching puzzle:", error);
+      }
+      finally{
+        setLoading(false);
       }
     };
 
@@ -46,29 +51,29 @@ export default function PuzzlePlay({ id }: { id: string }) {
             puzzle.dimensions.width,
             puzzle.dimensions.height
           );
-          
+
           // Create white overlay for cut-out pieces
           ctx.fillStyle = "white";
-          pieces.forEach(piece => {
+          pieces.forEach((piece) => {
             if (piece.originalPath) {
               ctx.beginPath();
               ctx.moveTo(piece.originalPath[0].x, piece.originalPath[0].y);
-              piece.originalPath.slice(1).forEach(point => {
+              piece.originalPath.slice(1).forEach((point) => {
                 ctx.lineTo(point.x, point.y);
               });
               ctx.closePath();
               ctx.fill();
             }
           });
-          
+
           // Draw piece outlines
           ctx.strokeStyle = "#666";
           ctx.lineWidth = 2;
-          pieces.forEach(piece => {
+          pieces.forEach((piece) => {
             if (piece.originalPath) {
               ctx.beginPath();
               ctx.moveTo(piece.originalPath[0].x, piece.originalPath[0].y);
-              piece.originalPath.slice(1).forEach(point => {
+              piece.originalPath.slice(1).forEach((point) => {
                 ctx.lineTo(point.x, point.y);
               });
               ctx.closePath();
@@ -125,8 +130,12 @@ export default function PuzzlePlay({ id }: { id: string }) {
     window.location.reload();
   };
 
-  if (!puzzle) {
+  if (loading) {
     return <Loader />;
+  }
+
+  if (!puzzle) {
+    return <div>Error: Puzzle not found</div>;
   }
 
   return (

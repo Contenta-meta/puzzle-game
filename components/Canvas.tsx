@@ -32,10 +32,8 @@ const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(
 
       const ctx = canvas.current!.getContext("2d")!;
 
-      // Snap the current position to the grid
       const snappedPos = snapToGrid(pos.x, pos.y);
 
-      // Draw line from last point to current point
       if (paths.current.length > 0) {
         const lastPos = paths.current[paths.current.length - 1];
         ctx.beginPath();
@@ -45,7 +43,6 @@ const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Draw a small circle at the snapped point for visual feedback
         ctx.beginPath();
         ctx.arc(snappedPos.x, snappedPos.y, 3, 0, 2 * Math.PI);
         ctx.fillStyle = "white";
@@ -89,7 +86,6 @@ const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(
 
       const piece = cropPath({ width, height, paths: paths.current, image });
 
-      // Add original path points to the piece data
       const pieceWithPaths = {
         ...piece,
         originalPath: [...paths.current],
@@ -107,7 +103,9 @@ const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(
         ctx.canvas.width = width;
         ctx.canvas.height = height;
         ctx.clearRect(0, 0, width, height);
-        ctx.drawImage(image, 0, 0);
+
+        // Scale the image to fit the canvas
+        ctx.drawImage(image, 0, 0, width, height);
       }
     }, [image, width, height, canvasRef]);
 

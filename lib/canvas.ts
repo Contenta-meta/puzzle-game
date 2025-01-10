@@ -84,23 +84,27 @@ export const cropPath = ({
   const ctx = document.createElement("canvas").getContext("2d")!;
   ctx.canvas.width = width;
   ctx.canvas.height = height;
+
   fillPath({ ctx, paths });
   ctx.save();
   ctx.clip();
-  ctx.drawImage(image, 0, 0);
-  ctx.strokeStyle = "#fff";
-  ctx.lineWidth = 5;
-  ctx.stroke();
+  ctx.drawImage(image, 0, 0, width, height);
   ctx.restore();
 
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
   const shapeSize = getShapeSize(paths);
+  const margin = 1;
   const trimmedCanvas = trimCanvas(
     ctx,
-    shapeSize.left,
-    shapeSize.bottom,
-    shapeSize.width,
-    shapeSize.height
+    Math.max(0, shapeSize.left - margin),
+    Math.max(0, shapeSize.bottom - margin),
+    shapeSize.width + 2 * margin,
+    shapeSize.height + 2 * margin
   );
+
   const { x, y } = paths[0];
 
   return {
