@@ -5,11 +5,12 @@ import Image from "next/image";
 import { PuzzleIcon, Plus, Trash2 } from "lucide-react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { usePuzzles } from "@/hooks/usePuzzles";
 import ErrorPage from "./ErrorPage";
 
 export default function PuzzleList() {
-  const { puzzles, setPuzzles, error } = usePuzzles();
+  const { puzzles, setPuzzles, error, loading } = usePuzzles();
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -34,7 +35,22 @@ export default function PuzzleList() {
         Puzzle Paradise
       </h1>
 
-      {puzzles.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[...Array(3)].map((_, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-lg shadow-lg overflow-hidden"
+            >
+              <Skeleton className="h-72 w-full" />
+              <div className="p-4">
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : puzzles.length === 0 ? (
         <div className="text-center bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto">
           <PuzzleIcon className="w-24 h-24 text-purple-600 mx-auto mb-4" />
           <p className="text-2xl text-gray-700 mb-6">
