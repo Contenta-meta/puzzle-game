@@ -1,72 +1,33 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import { useRouter } from "next/navigation";
 import Canvas from "@/components/Canvas";
 import Pieces from "@/components/Pieces";
-import { PuzzlePiece } from "@/types/types";
 import { Upload, Scissors, Save, Loader } from "lucide-react";
-import {
-  CldUploadButton,
-  CloudinaryUploadWidgetResults,
-} from "next-cloudinary";
-import axios from "axios";
+import { CldUploadButton } from "next-cloudinary";
 import { Button } from "@/components/ui/button";
 import ImageDescription from "@/components/ImageDescription";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import { usePuzzlePieces } from "@/hooks/usePuzzlePieces";
+import { usePuzzleSave } from "@/hooks/usePuzzleSave";
 
 export default function PuzzleCreate() {
-  const [image, setImage] = useState<HTMLImageElement | null>(null);
-  const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [isSaving, setIsSaving] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const router = useRouter();
-
-  const handleImageUpload = (result: CloudinaryUploadWidgetResults) => {
-    if (result?.info && typeof result.info !== "string") {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = result.info.secure_url;
-      img.onload = () => {
-        setPieces([])
-        setImage(img);
-        setDimensions({ width: 800, height: 800 }); // Set fixed canvas size
-      };
-    }
-  };
-
-  const onPiece = (piece: PuzzlePiece) => {
-    setPieces([piece, ...pieces]);
-  };
-
-  const onPieceChange = (newPiece: { id: string; x: number; y: number }) => {
-    const newPieces = pieces.map((piece) =>
-      piece.id === newPiece.id ? { ...piece, ...newPiece } : piece
-    );
-    setPieces(newPieces);
-  };
-
-  // const onPieceRemove = (id: string) => {
-  //   const newPieces = pieces.filter((piece) => piece.id !== id);
-  //   setPieces(newPieces);
-  // };
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  const { image, dimensions, handleImageUpload } = useImageUpload();
+  const { pieces, addPiece, updatePiece } = usePuzzlePieces();
+  const { isSaving, savePuzzle } = usePuzzleSave((id) => router.push(`/puzzle/play/${id}`));
 
   const handleSavePuzzle = async () => {
-    setIsSaving(true);
     const puzzleData = {
       image: image?.src,
       pieces,
       dimensions,
     };
 
-    try {
-      const { data } = await axios.post("/api/puzzles", puzzleData);
-      router.push(`/puzzle/play/${data.id}`);
-    } catch (error) {
-      console.error("Error saving puzzle:", error);
-    } finally {
-      setIsSaving(false);
-    }
+    await savePuzzle(puzzleData);
   };
 
   return (
@@ -123,13 +84,12 @@ export default function PuzzleCreate() {
                 ref={canvasRef}
                 width={dimensions.width}
                 height={dimensions.height}
-                onPiece={onPiece}
+                onPiece={addPiece}
                 image={image}
               />
               <Pieces
                 pieces={pieces}
-                onPieceChange={onPieceChange}
-                // onPieceRemove={onPieceRemove}
+                onPieceChange={updatePiece}
                 canvasRef={canvasRef as React.RefObject<HTMLCanvasElement>}
               />
             </div>
