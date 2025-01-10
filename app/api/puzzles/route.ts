@@ -1,55 +1,54 @@
 import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
-import { promises as fs } from "fs";
-import path from "path";
-import { Puzzle } from "@/types/types";
+import { createClient } from '@supabase/supabase-js';
 
-const dataFilePath = path.join(process.cwd(), "data", "puzzles.json");
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
-// Ensure data directory exists
-async function ensureDataDirectory() {
-  const dataDir = path.join(process.cwd(), "data");
+// Get all puzzles
+export async function GET() {
   try {
-    await fs.access(dataDir);
-  } catch {
-    await fs.mkdir(dataDir);
+    const { data, error } = await supabase
+      .from('puzzles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Error fetching puzzles:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch puzzles" },
+      { status: 500 }
+    );
   }
 }
 
-// Read puzzles from file
-async function readPuzzles(): Promise<Puzzle[]> {
-  try {
-    await ensureDataDirectory();
-    const data = await fs.readFile(dataFilePath, "utf8");
-    return JSON.parse(data);
-  } catch (err) {
-    console.error("Error reading puzzles:", err);
-    // If file doesn't exist or is empty, return empty array
-    return [];
-  }
-}
-
-// Write puzzles to file
-async function writePuzzles(puzzles: Puzzle[]) {
-  await ensureDataDirectory();
-  await fs.writeFile(dataFilePath, JSON.stringify(puzzles, null, 2));
-}
-
+// Create a new puzzle
 export async function POST(request: Request) {
   try {
     const puzzleData = await request.json();
-    const puzzles = await readPuzzles();
+    const id = uuidv4();
+    const createdAt = new Date().toISOString();
 
-    const newPuzzle: Puzzle = {
-      id: uuidv4(),
-      ...puzzleData,
-      createdAt: new Date().toISOString(),
-    };
+    const { data, error } = await supabase
+      .from('puzzles')
+      .insert([
+        {
+          id,
+          image: puzzleData.image,
+          pieces: puzzleData.pieces,
+          dimensions: puzzleData.dimensions,
+          created_at: createdAt
+        }
+      ])
+      .select()
+      .single();
 
-    puzzles.push(newPuzzle);
-    await writePuzzles(puzzles);
-
-    return NextResponse.json({ id: newPuzzle.id }, { status: 201 });
+    if (error) throw error;
+    return NextResponse.json(data, { status: 201 });
   } catch (error) {
     console.error("Error saving puzzle:", error);
     return NextResponse.json(

@@ -1,19 +1,10 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
-import { Puzzle } from "@/types/types";
+import { createClient } from '@supabase/supabase-js';
 
-const dataFilePath = path.join(process.cwd(), "data", "puzzles.json");
-
-async function readPuzzles(): Promise<Puzzle[]> {
-  try {
-    const data = await fs.readFile(dataFilePath, "utf8");
-    return JSON.parse(data);
-  } catch (err) {
-    console.error("Error reading puzzles:", err);
-    return [];
-  }
-}
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function GET(
   request: Request,
@@ -27,14 +18,17 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const puzzles = await readPuzzles();
-    const puzzle = puzzles.find((p) => p.id === id);
+    const { data, error } = await supabase
+      .from('puzzles')
+      .select('*')
+      .eq('id', id)
+      .single();
 
-    if (!puzzle) {
+    if (error) {
       return NextResponse.json({ error: "Puzzle not found" }, { status: 404 });
     }
 
-    return NextResponse.json(puzzle);
+    return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching puzzle:", error);
     return NextResponse.json(
@@ -56,15 +50,14 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const puzzles = await readPuzzles();
-    const puzzleIndex = puzzles.findIndex((p) => p.id === id);
+    const { error } = await supabase
+      .from('puzzles')
+      .delete()
+      .eq('id', id);
 
-    if (puzzleIndex === -1) {
+    if (error) {
       return NextResponse.json({ error: "Puzzle not found" }, { status: 404 });
     }
-
-    puzzles.splice(puzzleIndex, 1);
-    await fs.writeFile(dataFilePath, JSON.stringify(puzzles, null, 2));
 
     return NextResponse.json({ message: "Puzzle deleted successfully" });
   } catch (error) {
@@ -88,23 +81,23 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const puzzles = await readPuzzles();
-    const puzzleIndex = puzzles.findIndex((p) => p.id === id);
+    const updates = await request.json();
 
-    if (puzzleIndex === -1) {
+    const { data, error } = await supabase
+      .from('puzzles')
+      .update({
+        ...updates,
+        id: id, // Ensure ID cannot be changed
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
       return NextResponse.json({ error: "Puzzle not found" }, { status: 404 });
     }
 
-    const updates = await request.json();
-    puzzles[puzzleIndex] = {
-      ...puzzles[puzzleIndex],
-      ...updates,
-      id: id, // Ensure ID cannot be changed
-    };
-
-    await fs.writeFile(dataFilePath, JSON.stringify(puzzles, null, 2));
-
-    return NextResponse.json(puzzles[puzzleIndex]);
+    return NextResponse.json(data);
   } catch (error) {
     console.error("Error updating puzzle:", error);
     return NextResponse.json(
