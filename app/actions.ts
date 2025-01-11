@@ -22,3 +22,23 @@ export const getPuzzles = async (): Promise<GetPuzzlesReturn> => {
     return { error: "Error fetching puzzles" };
   }
 };
+
+type GetPuzzleByIdReturn = Puzzle | { error: string };
+
+export const getPuzzleById = async (
+  id: string
+): Promise<GetPuzzleByIdReturn> => {
+  try {
+    const { data, error } = await supabase
+      .from("puzzles")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error) throw error;
+    return data as Puzzle;
+  } catch (error) {
+    console.error("Error fetching puzzles:", error);
+    return { error: "Error fetching puzzles" };
+  }
+};

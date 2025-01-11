@@ -8,38 +8,6 @@ const supabase = createClient(
 
 export const runtime = "edge";
 
-export async function GET(
-  request: Request,
-  {
-    params,
-  }: {
-    params: Promise<{
-      id: string;
-    }>;
-  }
-) {
-  try {
-    const { id } = await params;
-    const { data, error } = await supabase
-      .from('puzzles')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) {
-      return NextResponse.json({ error: "Puzzle not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error("Error fetching puzzle:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch puzzle" },
-      { status: 500 }
-    );
-  }
-}
-
 export async function DELETE(
   request: Request,
   {

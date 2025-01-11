@@ -5,37 +5,14 @@ import Pieces from "@/components/Pieces";
 import { PuzzlePiece, Puzzle } from "@/types/types";
 import { Trophy } from "lucide-react";
 import confetti from "canvas-confetti";
-import axios from "axios";
 import { Button } from "@/components/ui/button";
 import ImageDescription from "./ImageDescription";
-import Loader from "./Loader";
 
-export default function PuzzlePlay({ id }: { id: string }) {
-  const [loading, setLoading] = useState(true);
-  const [puzzle, setPuzzle] = useState<Puzzle | null>(null);
-  const [pieces, setPieces] = useState<PuzzlePiece[]>([]);
+export default function PuzzlePlay({ puzzle }: { puzzle: Puzzle }) {
+  const [pieces, setPieces] = useState<PuzzlePiece[]>(puzzle.pieces);
   const [isComplete, setIsComplete] = useState(false);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const fetchPuzzle = async () => {
-      try {
-        setLoading(true);
-        const { data } = await axios.get(`/api/puzzles/${id}`);
-        setPuzzle(data);
-        setPieces(data.pieces);
-      } catch (error) {
-        console.error("Error fetching puzzle:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchPuzzle();
-    }
-  }, [id]);
 
   useEffect(() => {
     if (puzzle && canvasRef.current) {
@@ -131,10 +108,6 @@ export default function PuzzlePlay({ id }: { id: string }) {
     if (!puzzle) return;
     window.location.reload();
   };
-
-  if (loading) {
-    return <Loader />;
-  }
 
   if (!puzzle) {
     return <div>Error: Puzzle not found</div>;
