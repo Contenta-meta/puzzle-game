@@ -45,8 +45,8 @@ const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(
 
         ctx.beginPath();
         ctx.arc(snappedPos.x, snappedPos.y, 3, 0, 2 * Math.PI);
-        ctx.fillStyle = "white";
-        ctx.fill();
+        // ctx.fillStyle = "white";
+        // ctx.fill();
       }
       paths.current.push(snappedPos);
     };
@@ -82,7 +82,7 @@ const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(
         return;
       }
 
-      fillPath({ ctx, paths: paths.current, fillStyle: "#ababab" });
+      fillPath({ ctx, paths: paths.current, fillStyle: "white" });
 
       const piece = cropPath({ width, height, paths: paths.current, image });
 

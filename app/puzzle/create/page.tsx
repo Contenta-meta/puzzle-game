@@ -15,10 +15,14 @@ import { usePuzzleSave } from "@/hooks/usePuzzleSave";
 export default function PuzzleCreate() {
   const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
-  const { image, dimensions, handleImageUpload } = useImageUpload();
   const { pieces, addPiece, updatePiece } = usePuzzlePieces();
-  const { isSaving, savePuzzle } = usePuzzleSave((id) => router.push(`/puzzle/play/${id}`));
+  const { image, dimensions, handleImageUpload } = useImageUpload(
+    () => updatePiece
+  );
+
+  const { isSaving, savePuzzle } = usePuzzleSave((id) =>
+    router.push(`/puzzle/play/${id}`)
+  );
 
   const handleSavePuzzle = async () => {
     const puzzleData = {
@@ -49,7 +53,20 @@ export default function PuzzleCreate() {
             </div>
           </CldUploadButton>
         </div>
-
+        {image && (
+          <div className="text-center mb-6">
+            <p className="text-lg text-gray-700 mb-2 mt-4">
+              Great job! Now, let`s cut the picture into puzzle pieces.
+            </p>
+            <p className="text-lg text-gray-700 mb-4">
+              Click on the picture to create puzzle pieces!
+            </p>
+            <div className="flex items-center justify-center gap-2 text-purple-600">
+              <Scissors className="w-6 h-6" />
+              <span className="font-bold">Pieces created: {pieces.length}</span>
+            </div>
+          </div>
+        )}
         <div className="text-center py-6 mb-8">
           <Button
             onClick={handleSavePuzzle}
@@ -96,22 +113,7 @@ export default function PuzzleCreate() {
           </div>
         )}
 
-        {image && (
-          <div className="text-center mb-6">
-            <ImageDescription image={image} />
-
-            <p className="text-lg text-gray-700 mb-2 mt-4">
-              Great job! Now, let`s cut the picture into puzzle pieces.
-            </p>
-            <p className="text-lg text-gray-700 mb-4">
-              Click on the picture to create puzzle pieces!
-            </p>
-            <div className="flex items-center justify-center gap-2 text-purple-600">
-              <Scissors className="w-6 h-6" />
-              <span className="font-bold">Pieces created: {pieces.length}</span>
-            </div>
-          </div>
-        )}
+        {image && <ImageDescription image={image} />}
       </div>
     </div>
   );

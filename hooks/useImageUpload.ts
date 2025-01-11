@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { CloudinaryUploadWidgetResults } from 'next-cloudinary';
+import { PuzzlePiece } from '@/types/types';
 
-export const useImageUpload = () => {
+type UpdatePieceFn = (pieces: PuzzlePiece[]) => void;
+
+export const useImageUpload = (updatePiece: UpdatePieceFn) => {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -11,6 +14,7 @@ export const useImageUpload = () => {
       img.crossOrigin = "anonymous";
       img.src = result.info.secure_url;
       img.onload = () => {
+        updatePiece([])
         setImage(img);
         setDimensions({ width: 800, height: 800 }); // Set fixed canvas size
       };

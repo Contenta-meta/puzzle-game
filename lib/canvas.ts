@@ -91,7 +91,7 @@ export const cropPath = ({
   ctx.drawImage(image, 0, 0, width, height);
   ctx.restore();
 
-  ctx.strokeStyle = "white";
+  ctx.strokeStyle = "yellow";
   ctx.lineWidth = 2;
   ctx.stroke();
 
