@@ -2,6 +2,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { Puzzle } from "@/types/types";
+import { revalidatePath } from "next/cache";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -28,6 +29,7 @@ export const getPuzzles = async (): Promise<GetPuzzlesReturn> => {
     }
 
     console.log("Fetched puzzles:", data.length);
+    revalidatePath("/puzzle/play");
     return data as Puzzle[];
   } catch (error) {
     console.error("Error fetching puzzles:", error);
