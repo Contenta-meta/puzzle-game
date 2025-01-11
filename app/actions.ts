@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { Puzzle } from "@/types/types";
+import { revalidatePath } from "next/cache";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -10,14 +11,6 @@ type GetPuzzlesReturn = Puzzle[] | { error: string };
 
 export const getPuzzles = async (): Promise<GetPuzzlesReturn> => {
   try {
-    if (
-      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    ) {
-      console.error("Missing Supabase environment variables");
-      return { error: "Configuration error" };
-    }
-
     const { data, error } = await supabase
       .from("puzzles")
       .select("*")
@@ -34,6 +27,7 @@ export const getPuzzles = async (): Promise<GetPuzzlesReturn> => {
     }
 
     console.log("Fetched puzzles:", data.length);
+    revalidatePath("/play");
     return data as Puzzle[];
   } catch (error) {
     console.error("Error fetching puzzles:", error);
