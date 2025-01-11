@@ -7,5 +7,6 @@ export default async function PuzzleListPage() {
   const data = await getPuzzles();
 
   if ("error" in data) return <ErrorPage />;
+
   return <PuzzleList puzzles={data} />;
 }
