@@ -27,7 +27,7 @@ export const getPuzzles = async (): Promise<GetPuzzlesReturn> => {
     }
 
     console.log("Fetched puzzles:", data.length);
-    revalidatePath("/play");
+    revalidatePath("/puzzle/play");
     return data as Puzzle[];
   } catch (error) {
     console.error("Error fetching puzzles:", error);
