@@ -10,6 +10,25 @@ const supabase = createClient(
 
 export const runtime = "edge";
 
+// Get all puzzles
+export async function GET() {
+  try {
+    const { data, error } = await supabase
+      .from('puzzles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Error fetching puzzles:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch puzzles" },
+      { status: 500 }
+    );
+  }
+}
+
 // Create a new puzzle
 export async function POST(request: Request) {
   try {

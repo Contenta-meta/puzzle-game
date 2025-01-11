@@ -6,7 +6,15 @@ import ErrorPage from "@/components/ErrorPage";
 export default async function PuzzleListPage() {
   const data = await getPuzzles();
 
-  if ("error" in data) return <ErrorPage />;
+  if ("error" in data) {
+    console.error("Error in PuzzleListPage:", data.error);
+    return <ErrorPage />;
+  }
+
+  if (!Array.isArray(data) || data.length === 0) {
+    console.log("No puzzles found");
+    return <PuzzleList puzzles={[]} />;
+  }
 
   return <PuzzleList puzzles={data} />;
 }

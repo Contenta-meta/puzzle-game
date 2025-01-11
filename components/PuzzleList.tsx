@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 
 export default function PuzzleList({ puzzles }: { puzzles: Puzzle[] }) {
   const router = useRouter();
+
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     if (confirm("Are you sure you want to delete this puzzle?")) {
