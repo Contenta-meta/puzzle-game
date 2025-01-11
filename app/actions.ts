@@ -10,7 +10,10 @@ type GetPuzzlesReturn = Puzzle[] | { error: string };
 
 export const getPuzzles = async (): Promise<GetPuzzlesReturn> => {
   try {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    if (
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ) {
       console.error("Missing Supabase environment variables");
       return { error: "Configuration error" };
     }
@@ -24,7 +27,7 @@ export const getPuzzles = async (): Promise<GetPuzzlesReturn> => {
       console.error("Supabase error:", error);
       throw error;
     }
-    
+
     if (!data) {
       console.error("No data returned from Supabase");
       return { error: "No data available" };
@@ -34,7 +37,12 @@ export const getPuzzles = async (): Promise<GetPuzzlesReturn> => {
     return data as Puzzle[];
   } catch (error) {
     console.error("Error fetching puzzles:", error);
-    return { error: typeof error === 'object' ? JSON.stringify(error) : 'Error fetching puzzles' };
+    return {
+      error:
+        typeof error === "object"
+          ? JSON.stringify(error)
+          : "Error fetching puzzles",
+    };
   }
 };
 

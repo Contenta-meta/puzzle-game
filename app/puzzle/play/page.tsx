@@ -11,10 +11,5 @@ export default async function PuzzleListPage() {
     return <ErrorPage />;
   }
 
-  if (!Array.isArray(data) || data.length === 0) {
-    console.log("No puzzles found");
-    return <PuzzleList puzzles={[]} />;
-  }
-
   return <PuzzleList puzzles={data} />;
 }
