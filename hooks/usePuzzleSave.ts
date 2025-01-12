@@ -1,29 +1,24 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { PuzzlePiece } from '@/types/types';
-
-interface PuzzleData {
-  image: string | undefined;
-  pieces: PuzzlePiece[];
-  dimensions: { width: number; height: number };
-}
+import { useState } from "react";
+import { Puzzle } from "@/types/types";
+import { savePuzzle } from "@/app/actions";
 
 export const usePuzzleSave = (onSuccess?: (id: string) => void) => {
   const [isSaving, setIsSaving] = useState(false);
 
-  const savePuzzle = async (puzzleData: PuzzleData) => {
-    setIsSaving(true);
+  const savePuzzleData = async (puzzleData: Puzzle) => {
     try {
-      const { data } = await axios.post("/api/puzzles", puzzleData);
-      onSuccess?.(data.id);
-      return data;
+      const result = await savePuzzle(puzzleData);
+      if ("error" in result) {
+        throw new Error(result.error);
+      }
+      onSuccess?.(result.id);
     } catch (error) {
       console.error("Error saving puzzle:", error);
-      throw error;
+      alert("Failed to save puzzle");
     } finally {
       setIsSaving(false);
     }
   };
 
-  return { isSaving, savePuzzle };
+  return { isSaving, savePuzzleData };
 };

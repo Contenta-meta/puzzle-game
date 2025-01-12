@@ -11,7 +11,6 @@ export interface PuzzlePiece {
 export interface Puzzle {
   id: string;
   pieces: PuzzlePiece[];
-  name: string;
   image: string;
   dimensions: {
     width: number;

@@ -20,18 +20,19 @@ export default function PuzzleCreate() {
     () => updatePiece
   );
 
-  const { isSaving, savePuzzle } = usePuzzleSave((id) =>
+  const { isSaving, savePuzzleData } = usePuzzleSave((id) =>
     router.push(`/puzzle/play/${id}`)
   );
 
   const handleSavePuzzle = async () => {
     const puzzleData = {
-      image: image?.src,
+      id: crypto.randomUUID(),
+      image: image!.src,
       pieces,
       dimensions,
     };
 
-    await savePuzzle(puzzleData);
+    await savePuzzleData(puzzleData);
   };
 
   return (
